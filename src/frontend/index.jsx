@@ -31,7 +31,9 @@ const App = () => {
     const commits = await invoke("fetchCommits", {
       commitsUrl: repo.links.commits.href,
     });
-    console.log(`Number of commits: ${commits.values.length}`);
+    console.log(`Number of commits: ${JSON.stringify(commits)}`);
+    const reviewComments = await invoke("fetchReviewComments");
+    console.log(`review comments: ${JSON.stringify(reviewComments)}`);
   }, []);
 
   return (

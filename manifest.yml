@@ -4,14 +4,13 @@ modules:
       resource: main
       resolver:
         function: resolver
-      render: native
       title: test
   function:
     - key: resolver
       handler: index.handler
 resources:
   - key: main
-    path: src/frontend/index.jsx
+    path: static/front-end/build
 app:
   runtime:
     name: nodejs20.x
@@ -19,3 +18,4 @@ app:
 permissions:
   scopes:
     - read:repository:bitbucket
+    - read:pullrequest:bitbucket

@@ -17,11 +17,31 @@ resolver.define("fetchRepository", async ({ context }) => {
   const workspaceId = context.workspaceId;
   const repositoryId = context.extension.repository.uuid;
 
+  console.log("context-->", context);
+
   console.log(`Fetching repository ${workspaceId}/${repositoryId}`);
 
   const res = await api
     .asApp()
     .requestBitbucket(route`/2.0/repositories/${workspaceId}/${repositoryId}`);
+
+  return res.json();
+});
+
+resolver.define("fetchReviewComments", async ({ context }) => {
+  const workspaceId = context.workspaceId;
+  const repositoryId = context.extension.repository.uuid;
+  const pullRequestId = context.extension.pullRequest.id;
+
+  console.log(
+    `Fetching reviewcomments ${workspaceId}/${repositoryId}/${pullRequestId}`
+  );
+
+  const res = await api
+    .asApp()
+    .requestBitbucket(
+      route`/2.0/repositories/${workspaceId}/${repositoryId}/pullrequests/${pullRequestId}/comments`
+    );
 
   return res.json();
 });
