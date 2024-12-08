@@ -1,0 +1,21 @@
+modules:
+  bitbucket:repoPullRequestCard:
+    - key: test-hello-world-pull-request-card
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: test
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs20.x
+  id: ari:cloud:ecosystem::app/45e15c0c-80b6-4c6b-b88b-5ce8f03877ca
+permissions:
+  scopes:
+    - read:repository:bitbucket
