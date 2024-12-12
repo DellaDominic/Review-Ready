@@ -1,30 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { invoke } from "@forge/bridge";
+import { CiSquarePlus } from "react-icons/ci";
+import { GoPlus } from "react-icons/go";
 
 const App = () => {
-  const [data, setData] = useState(null);
-
-  useEffect(async () => {
-    const repo = await invoke("fetchRepository");
-    console.log(`Repository full name: ${JSON.stringify(repo.full_name)}`);
-    const commits = await invoke("fetchCommits", {
-      commitsUrl: repo.links.commits.href,
-    });
-    console.log(`Number of commits: ${JSON.stringify(commits)}`);
-    const reviewComments = await invoke("fetchReviewComments");
-    console.log(`review comments: ${JSON.stringify(reviewComments)}`);
-  }, []);
-
-  // const handleCheckboxChange = (event) => {
-  //   setIsChecked(event.target.checked);
-  // };
-
-  const comments = [
+  const [comments, setComments] = useState([
     {
       id: 1,
       fileName: "main.py",
       lineNumber: 45,
-      comment: "Consider renaming this variable to improve readability.",
+      comment:
+        "The purpose of the PR is clearly described in the title and/or description.",
       reviewer: "Alice Smith",
       status: "Open",
       resolution: "Will rename to `processed_data` in the next commit.",
@@ -33,7 +19,8 @@ const App = () => {
       id: 2,
       fileName: "utils/helpers.py",
       lineNumber: 72,
-      comment: "Avoid using hardcoded values; use a constant instead.",
+      comment:
+        "All related Jira tickets/issues are linked in the PR description.",
       reviewer: "Bob Johnson",
       status: "Resolved",
       resolution: "Added a constant `TIMEOUT` in `constants.py`.",
@@ -42,8 +29,7 @@ const App = () => {
       id: 3,
       fileName: "README.md",
       lineNumber: "N/A",
-      comment:
-        "Please update the documentation to include examples of the new API usage.",
+      comment: "The PR includes relevant screenshots or logs (if applicable).",
       reviewer: "Alice Smith",
       status: "Pending",
       resolution: "Will add examples by the next update.",
@@ -52,13 +38,44 @@ const App = () => {
       id: 4,
       fileName: "styles.css",
       lineNumber: 120,
-      comment:
-        "There's a typo in the class name; it should be `.navbar-active` instead.",
+      comment: "Full code coverage on new functionality by unit tests.",
       reviewer: "Charlie Brown",
       status: "Resolved",
       resolution: "Corrected the typo.",
     },
-  ];
+  ]);
+  const [data, setData] = useState(null);
+  const [newCheckItem, setNewCheckItem] = useState("");
+  const [isCheckedList, setIsCheckedList] = useState(
+    Array(comments.length).fill(false)
+  );
+
+  const handleAddCheck = () => {
+    if (newCheckItem) {
+      setComments([
+        ...comments,
+        { id: comments.length, comment: newCheckItem },
+      ]);
+      setNewCheckItem("");
+    }
+  };
+
+  useEffect(async () => {
+    const repo = await invoke("fetchRepository");
+    console.log(`Repository full name: ${JSON.stringify(repo.full_name)}`);
+    const commits = await invoke("fetchCommits", {
+      commitsUrl: repo.links.commits.href,
+    });
+    setData(JSON.stringify(commits));
+    console.log(`Number of commits: ${JSON.stringify(commits)}`);
+    const reviewComments = await invoke("fetchReviewComments");
+    console.log(`review comments: ${JSON.stringify(reviewComments)}`);
+  }, []);
+
+  const handleCheckboxChange = (event, index) => {
+    setIsChecked(event.target.checked);
+  };
+
   console.log("data----->", data);
   return (
     <>
@@ -68,11 +85,11 @@ const App = () => {
         <table style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead>
             <tr>
-              <th>man</th>
+              <th>Done</th>
               {/* <th>File Name</th>
           <th>Line Number</th> */}
-              <th>Comment</th>
-              <th>Details</th>
+              <th>PR checks</th>
+              {/* <th>Comments</th> */}
               {/* <th>Reviewer</th>
           <th>Status</th>
           <th>Response/Resolution</th> */}
@@ -83,22 +100,54 @@ const App = () => {
               return (
                 <tr key={comment.id}>
                   {/* <td>{index + 1}</td> */}
-                  {/* <input
+                  <input
+                    style={{ marginTop: "10px" }}
                     type="checkbox"
-                    checked={isChecked}
-                    onChange={handleCheckboxChange}
-                  /> */}
+                    id={comment.id}
+                    value={comment.comment}
+                    // checked={isCheckedList[index]}
+                    onChange={(e, index) =>
+                      setIsCheckedList([
+                        ...isCheckedList,
+                        (isCheckedList[index] = e.target.checked),
+                      ])
+                    }
+                  />
+
                   {/* <td>{comment.fileName}</td>
             <td>{comment.lineNumber}</td> */}
-                  <td>{comment.comment}</td>
+                  <td>
+                    <label for={comment.id}>{comment.comment}</label>
+                  </td>
+                  {/* <td>
+                  <input
+                  // value={newCheckItem}
+                  style={{ width: "30%" }}
+                  // onChange={(e) => setNewCheckItem(e.target.value)}
+                ></input>
+                  </td> */}
                   {/* scroll to the comment on click----------------------- */}
-                  <td>{<button onClick={() => {}}>See comment</button>}</td>
+                  {/* <td>{<button onClick={() => {}}>Notes</button>}</td> */}
                   {/* <td>{comment.reviewer}</td>
             <td>{comment.status}</td>
             <td>{comment.resolution}</td> */}
                 </tr>
               );
             })}
+            <tr>
+              <th>
+                <div onClick={handleAddCheck} style={{ marginLeft: "3px" }}>
+                  <GoPlus />
+                </div>
+              </th>
+              <th>
+                <input
+                  value={newCheckItem}
+                  style={{ width: "90%" }}
+                  onChange={(e) => setNewCheckItem(e.target.value)}
+                ></input>
+              </th>
+            </tr>
           </tbody>
         </table>
       </div>

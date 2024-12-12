@@ -4,7 +4,7 @@ modules:
       resource: main
       resolver:
         function: resolver
-      title: test
+      title: ReviewReady
   function:
     - key: resolver
       handler: index.handler
